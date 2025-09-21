@@ -1,4 +1,4 @@
-package io.granix.user;
+package io.granix.user.repository;
 
 import io.granix.user.entity.UserEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;

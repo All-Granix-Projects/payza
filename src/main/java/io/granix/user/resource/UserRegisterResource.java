@@ -1,7 +1,9 @@
 package io.granix.user.resource;
 
-import io.granix.user.UserService;
+import io.granix.common.event.user.UserCreatedEvent;
+import io.granix.user.service.UserService;
 import io.granix.user.dto.request.UserRegisterRequest;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -23,6 +25,9 @@ public class UserRegisterResource {
     @Inject
     UserService service;
 
+    @Inject
+    private Event<UserCreatedEvent> userCreated;
+
     @POST
     @Path("/register")
     @Produces(MediaType.APPLICATION_JSON)
@@ -34,7 +39,14 @@ public class UserRegisterResource {
                     request.password,
                     request.RGPDOption
             );
+
             System.out.println("User registered: "+user.toString());
+
+            userCreated.fireAsync(new UserCreatedEvent(
+                    user.id,
+                    user.msisdnEncrypted,
+                    user.emailEncrypted
+            ));
 
             response.put("message", "User Registered Successfully!");
             response.put("userId", user.id);
@@ -46,7 +58,8 @@ public class UserRegisterResource {
                  | IllegalBlockSizeException
                  | NoSuchAlgorithmException
                  | BadPaddingException
-                 | IllegalArgumentException e) {
+                 | IllegalArgumentException
+                 | InterruptedException e) {
             System.out.println("Error during registration: " + e.getMessage());
 
             response.put("message", e.getMessage());

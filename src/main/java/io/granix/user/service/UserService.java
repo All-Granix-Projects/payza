@@ -1,11 +1,12 @@
-package io.granix.user;
+package io.granix.user.service;
 
 import io.granix.common.event.user.UserCreatedEvent;
 import io.granix.common.security.CryptoService;
 import io.granix.user.entity.Role;
-import io.granix.user.entity.RoleNames;
+import io.granix.user.entity.utils.RoleNames;
 import io.granix.user.entity.UserEntity;
-import io.granix.user.entity.UserStatus;
+import io.granix.user.entity.utils.UserStatus;
+import io.granix.user.repository.UserRepository;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
@@ -29,20 +30,11 @@ public class UserService {
     @Inject
     private CryptoService cryptoService;
 
-    @Inject
-    Event<UserCreatedEvent> userCreated;
-
     public UserService(){ }
 
     public UserService(UserRepository repository, CryptoService cryptoService){
         this.repository = repository;
         this.cryptoService = cryptoService;
-    }
-
-    public UserService(UserRepository repository, CryptoService cryptoService, Event<UserCreatedEvent> event){
-        this.repository = repository;
-        this.cryptoService = cryptoService;
-        this.userCreated = event;
     }
 
     /**
@@ -59,14 +51,15 @@ public class UserService {
             IllegalBlockSizeException,
             NoSuchAlgorithmException,
             BadPaddingException,
-            InvalidKeyException {
+            InvalidKeyException,
+            InterruptedException {
 
         // Verify that msisdn doesn't exist in database
         if (repository.find("msisdnEncrypted", cryptoService.encrypt(msisdn)).firstResult() != null)
             throw new IllegalArgumentException("Phone number already in use");
 
         // Setup default Role
-        var dafaultRole = new Role(RoleNames.USER);
+        var dafaultRole = Role.findOrCreate(RoleNames.USER);
 
         // Setup User
         var user = new UserEntity();
@@ -79,12 +72,6 @@ public class UserService {
         user.roles.add(dafaultRole);
 
         repository.persist(user);
-
-        userCreated.fireAsync(new UserCreatedEvent(
-                user.id,
-                user.msisdnEncrypted,
-                user.emailEncrypted
-        ));
 
         return user;
     }
