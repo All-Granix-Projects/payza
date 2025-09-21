@@ -12,14 +12,14 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "pz_wallet")
-public class Wallet extends PanacheEntityBase {
+public class WalletEntity extends PanacheEntityBase {
 
     // Identity
     @Id
     public UUID id;
 
     @Column(nullable = false, unique = true)
-    public String iban;
+    public String ibanEncrypted;
 
     @Column(nullable = false)
     public UUID ownerId;
@@ -39,7 +39,7 @@ public class Wallet extends PanacheEntityBase {
 
     // Currency configurations
     @Column(nullable = false)
-    public String currencyCode;
+    public String currencyCode; // MGA, USD, ...
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

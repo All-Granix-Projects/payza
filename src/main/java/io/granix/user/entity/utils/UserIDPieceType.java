@@ -1,4 +1,4 @@
-package io.granix.user.entity;
+package io.granix.user.entity.utils;
 
 public enum UserIDPieceType {
     CIN,

@@ -1,6 +1,6 @@
 package io.granix.user.resource;
 
-import io.granix.user.UserService;
+import io.granix.user.service.UserService;
 import io.granix.user.dto.request.UserAuthenticationRequest;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.inject.Inject;
