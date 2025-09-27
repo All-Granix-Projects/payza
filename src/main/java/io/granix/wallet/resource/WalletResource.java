@@ -46,6 +46,7 @@ public class WalletResource {
     @RolesAllowed({"USER", "ADMIN"})
     public List<WalletResponse> listByUserId(@PathParam("userId") String userId)
     {
+        System.out.println("====================================Get Single Wallet====================================");
         var user = jwt.getClaim("userId");
 
         System.out.println("UserId From JWT: "+user);
@@ -57,6 +58,7 @@ public class WalletResource {
 
         var wallets = service.searchByUser(UUID.fromString(userId));
 
+        System.out.println("====================================End of Get Single Wallet====================================");
         return wallets.stream()
                 .map(w -> new WalletResponse(
                         w.id,
