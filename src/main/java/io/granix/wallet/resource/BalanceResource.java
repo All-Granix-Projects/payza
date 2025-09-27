@@ -1,21 +1,19 @@
 package io.granix.wallet.resource;
 
-import io.granix.wallet.dto.response.WalletResponse;
+import io.granix.wallet.dto.response.BalanceResponse;
 import io.granix.wallet.service.WalletInformationService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.SecurityContext;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Path(value = "/wallets")
-public class WalletResource {
+@Path(value = "/wallets/balance")
+public class BalanceResource {
     @Inject
     WalletInformationService service;
 
@@ -26,12 +24,12 @@ public class WalletResource {
     @RolesAllowed("ADMIN")
     @Path(value = "/")
     @Produces(value = MediaType.APPLICATION_JSON)
-    public List<WalletResponse> list()
+    public List<BalanceResponse> list()
     {
         var wallets = service.getAllWallet();
 
         return wallets.stream()
-                .map(w -> new WalletResponse(
+                .map(w -> new BalanceResponse(
                         w.id,
                         w.balance,
                         w.availableBalance,
@@ -44,7 +42,7 @@ public class WalletResource {
     @GET
     @Path("/user/{userId}")
     @RolesAllowed({"USER", "ADMIN"})
-    public List<WalletResponse> listByUserId(@PathParam("userId") String userId)
+    public List<BalanceResponse> listByUserId(@PathParam("userId") String userId)
     {
         System.out.println("====================================Get Single Wallet====================================");
         var user = jwt.getClaim("userId");
@@ -60,7 +58,7 @@ public class WalletResource {
 
         System.out.println("====================================End of Get Single Wallet====================================");
         return wallets.stream()
-                .map(w -> new WalletResponse(
+                .map(w -> new BalanceResponse(
                         w.id,
                         w.balance,
                         w.availableBalance,
@@ -73,7 +71,7 @@ public class WalletResource {
     @GET
     @Path("{walletId}/user/{userId}")
     @RolesAllowed({"USER", "ADMIN"})
-    public WalletResponse getWalletByUserId(
+    public BalanceResponse getWalletByUserId(
             @PathParam("userId") String userId,
             @PathParam("walletId") String walletId
     ) {
@@ -90,7 +88,7 @@ public class WalletResource {
         var wallet = service.getWalletByUserId(UUID.fromString(userId), UUID.fromString(walletId));
 
         System.out.println("====================================End of Get Single Wallet====================================");
-        return new WalletResponse(
+        return new BalanceResponse(
                 wallet.id,
                 wallet.balance,
                 wallet.availableBalance,
