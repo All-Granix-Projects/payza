@@ -1,8 +1,7 @@
-package io.granix.user.entity;
+package io.granix.user.database.entity;
 
-import io.granix.user.entity.utils.RoleNames;
+import io.granix.user.database.entity.utils.RoleNames;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

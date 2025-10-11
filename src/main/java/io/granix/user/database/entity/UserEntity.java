@@ -1,8 +1,8 @@
-package io.granix.user.entity;
+package io.granix.user.database.entity;
 
 import io.granix.common.converter.MapToJsonConverter;
-import io.granix.user.entity.utils.UserIDPieceType;
-import io.granix.user.entity.utils.UserStatus;
+import io.granix.user.database.entity.utils.UserIDPieceType;
+import io.granix.user.database.entity.utils.UserStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 

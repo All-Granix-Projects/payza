@@ -1,6 +1,6 @@
-package io.granix.user.repository;
+package io.granix.user.database.repository;
 
-import io.granix.user.entity.UserEntity;
+import io.granix.user.database.entity.UserEntity;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 

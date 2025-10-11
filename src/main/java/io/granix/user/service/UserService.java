@@ -1,15 +1,13 @@
 package io.granix.user.service;
 
-import io.granix.common.event.user.UserCreatedEvent;
 import io.granix.common.security.CryptoService;
-import io.granix.user.entity.Role;
-import io.granix.user.entity.utils.RoleNames;
-import io.granix.user.entity.UserEntity;
-import io.granix.user.entity.utils.UserStatus;
-import io.granix.user.repository.UserRepository;
+import io.granix.user.database.entity.Role;
+import io.granix.user.database.entity.utils.RoleNames;
+import io.granix.user.database.entity.UserEntity;
+import io.granix.user.database.entity.utils.UserStatus;
+import io.granix.user.database.repository.UserRepository;
 import io.quarkus.elytron.security.common.BcryptUtil;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
@@ -76,6 +74,42 @@ public class UserService {
         return user;
     }
 
+    @Transactional
+    public UserEntity registerAdmin(
+            String msisdn,
+            String password,
+            boolean isRGPD
+    ) throws InvalidAlgorithmParameterException,
+            NoSuchPaddingException,
+            IllegalBlockSizeException,
+            NoSuchAlgorithmException,
+            BadPaddingException,
+            InvalidKeyException,
+            InterruptedException {
+
+        // Verify that msisdn doesn't exist in database
+        if (repository.find("msisdnEncrypted", cryptoService.encrypt(msisdn)).firstResult() != null)
+            throw new IllegalArgumentException("Phone number already in use");
+
+        // Setup default Role
+        var dafaultRole = Role.findOrCreate(RoleNames.ADMIN);
+
+        // Setup User
+        var user = new UserEntity();
+        user.id = UUID.randomUUID();
+        user.msisdnEncrypted = cryptoService.encrypt(msisdn);
+        user.passwordHashed = BcryptUtil.bcryptHash(password);
+        user.createdAt = LocalDateTime.now();
+        user.isRGPD = isRGPD;
+        user.status = UserStatus.ACTIVE;
+        user.roles.add(dafaultRole);
+
+        repository.persist(user);
+
+        return user;
+    }
+
+
     public UserEntity authenticate(String phone, String password)
             throws InvalidAlgorithmParameterException,
             NoSuchPaddingException,
@@ -93,6 +127,16 @@ public class UserService {
             throw new IllegalArgumentException("Invalid password");
 
         return user;
+    }
+
+    public UserEntity findByMSISDN(String msisdn)
+            throws InvalidAlgorithmParameterException,
+            NoSuchPaddingException,
+            IllegalBlockSizeException,
+            NoSuchAlgorithmException,
+            BadPaddingException,
+            InvalidKeyException {
+        return repository.find("msisdnEncrypted", cryptoService.encrypt(msisdn)).firstResult();
     }
 
     public String decryptPhone(UserEntity user)

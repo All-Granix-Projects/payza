@@ -1,4 +1,4 @@
-package io.granix.user.entity.utils;
+package io.granix.user.database.entity.utils;
 
 public enum UserStatus {
     ACTIVE,
